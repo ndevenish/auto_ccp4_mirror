@@ -44,7 +44,7 @@ if [[ "${_positionals[*]+true}" == true ]]; then
 fi
 if [[ $# -ne 2 ]]; then
     print_help
-    exit 0
+    exit 1
 fi
 
 DIR=$(pwd)
