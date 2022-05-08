@@ -60,26 +60,30 @@ fi
 
 echo "Creating new git repository ${BOLD}$repo_name$NC from $URL$repo_url$NC"
 
-set -x
-mkdir "$repo_dir"
+
 (
+    set -x
+    mkdir "$repo_dir"
     cd $repo_dir
     git init --initial-branch=main
 )
 
-# Run docker to fill out this repository
-section "Building repository"
-docker build -t bzr_cloner .
+(
+    set -x
+    # Run docker to fill out this repository
+    echo "${BOLD}Building repository$NC"
+    docker build -t bzr_cloner .
 
-docker run -v "$repo_dir:/opt/repo" bzr_cloner bash -c "
-set -x
-brz checkout ${repo_url} /opt/imported
-cd /opt/imported
-brz fast-export -b main | git -C /opt/repo fast-import
-"
-git -C "$repo_dir" reset --hard main
+    docker run -v "$repo_dir:/opt/repo" bzr_cloner bash -c "
+    set -x
+    brz checkout ${repo_url} /opt/imported
+    cd /opt/imported
+    brz fast-export -b main | git -C /opt/repo fast-import
+    "
+    git -C "$repo_dir" reset --hard main
+)
 
-section "Adding auto maintenance tools to repository"
+echo "${BOLD}Adding auto maintenance tools to repository$NC"
 (
     set -x
     shopt -s dotglob 
